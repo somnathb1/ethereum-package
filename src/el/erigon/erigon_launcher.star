@@ -104,6 +104,7 @@ def get_config(
     port_publisher,
     participant_index,
 ):
+    externalcl = cl_client_name != "caplin"
     init_datadir_cmd_str = "erigon init --datadir={0} {1}".format(
         EXECUTION_DATA_DIRPATH_ON_CLIENT_CONTAINER,
         constants.GENESIS_CONFIG_MOUNT_PATH_ON_CONTAINER + "/genesis.json",
@@ -133,8 +134,13 @@ def get_config(
         constants.WS_RPC_PORT_ID: WS_RPC_PORT_NUM,
         constants.METRICS_PORT_ID: METRICS_PORT_NUM,
     }
-    used_ports = shared_utils.get_port_specs(used_port_assignments)
 
+    if not externalcl:
+        used_port_assignments[constants.HTTP_PORT_ID] = 4000
+
+    used_ports = shared_utils.get_port_specs(used_port_assignments)
+    plan.print("SPIDERMAN used_ports")
+    plan.print(used_ports)
     cmd = [
         "erigon",
         "{0}".format(
@@ -159,7 +165,6 @@ def get_config(
         "--authrpc.addr=0.0.0.0",
         "--authrpc.port={0}".format(ENGINE_RPC_PORT_NUM),
         "--authrpc.vhosts=*",
-        "--externalcl",
         "--metrics",
         "--metrics.addr=0.0.0.0",
         "--metrics.port={0}".format(METRICS_PORT_NUM),
@@ -169,6 +174,59 @@ def get_config(
         constants.GENESIS_DATA_MOUNTPOINT_ON_CLIENTS: launcher.el_cl_genesis_data.files_artifact_uuid,
         constants.JWT_MOUNTPOINT_ON_CLIENTS: launcher.jwt_file,
     }
+
+    if externalcl:
+        cmd.append("--externalcl")
+    else:
+        cmd.append(
+            "--caplin.custom-config="
+            + constants.GENESIS_CONFIG_MOUNT_PATH_ON_CONTAINER
+            + "/config.yaml"
+        )
+
+        cmd.append(
+            "--caplin.custom-genesis="
+            + constants.GENESIS_CONFIG_MOUNT_PATH_ON_CONTAINER
+            + "/genesis.ssz"
+        )
+
+        cmd.append("--beacon.api=beacon,builder,config,debug,events,node,validator,lighthouse")
+        cmd.append("--caplin.enable-upnp")
+        cmd.append("--caplin.discovery.addr=0.0.0.0") 
+        cmd.append("--caplin.discovery.port=9000") 
+        cmd.append("--caplin.discovery.tcpport=9000") 
+        cmd.append("--beacon.api.port=4000")
+        cmd.append("--beacon.api.addr=0.0.0.0")
+        
+
+        # if (
+        #     launcher.network_params.network == constants.NETWORK_NAME.kurtosis
+        #     or constants.NETWORK_NAME.shadowfork in launcher.network_params.network
+        # ):
+        #     if bootnode_contexts != None:
+        #         cmd.append(
+        #             "--sentinel.bootnodes="
+        #             + ",".join(
+        #                 [
+        #                     ctx.enr
+        #                     for ctx in bootnode_contexts[: constants.MAX_ENR_ENTRIES]
+        #                 ]
+        #             )
+        #         )
+        #     elif launcher.network_params.network == constants.NETWORK_NAME.ephemery:
+        #         cmd.append(
+        #             "--sentinel.bootnodes="
+        #             + shared_utils.get_devnet_enrs_list(
+        #                 plan, launcher.el_cl_genesis_data.files_artifact_uuid
+        #             )
+        #         )
+        #     else:  # Devnets
+        #         cmd.append(
+        #             "--sentinel.bootnodes="
+        #             + shared_utils.get_devnet_enrs_list(
+        #                 plan, launcher.el_cl_genesis_data.files_artifact_uuid
+        #             )
+        #         )
 
     if persistent:
         cmd.append(

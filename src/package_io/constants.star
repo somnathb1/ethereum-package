@@ -10,6 +10,7 @@ EL_TYPE = struct(
 )
 
 CL_TYPE = struct(
+    caplin="caplin",
     lighthouse="lighthouse",
     teku="teku",
     nimbus="nimbus",
