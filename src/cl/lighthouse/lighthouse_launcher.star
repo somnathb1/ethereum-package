@@ -254,6 +254,12 @@ def get_beacon_config(
     if checkpoint_sync_enabled:
         cmd.append("--checkpoint-sync-url=" + checkpoint_sync_url)
 
+    plan.print("SPIDERMAN LH LAUNCHER")
+    plan.print("bootnode_contexts")
+    plan.print(bootnode_contexts)
+    plan.print('checkpoint_sync_url')
+    plan.print(checkpoint_sync_url)
+
     if launcher.network_params.network not in constants.PUBLIC_NETWORKS:
         cmd.append("--testnet-dir=" + constants.GENESIS_CONFIG_MOUNT_PATH_ON_CONTAINER)
         if (

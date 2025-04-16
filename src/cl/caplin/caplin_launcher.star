@@ -62,16 +62,33 @@ def launch(
     abc = "xyz"
     plan.print("SPIDERMNA EL CONTEXT")
     plan.print(el_context)
+
+    beacon_node_identity_recipe = GetHttpRequestRecipe(
+        endpoint="/eth/v1/node/identity",
+        port_id=constants.HTTP_PORT_ID,
+        extract={
+            "enr": ".data.enr",
+            "multiaddr": ".data.p2p_addresses[0]",
+            "peer_id": ".data.peer_id",
+        },
+    )
+    response = plan.request(
+        recipe=beacon_node_identity_recipe, service_name=el_context.service_name
+    )
+    beacon_node_enr = response["extract.enr"]
+    beacon_multiaddr = response["extract.multiaddr"]
+    beacon_peer_id = response["extract.peer_id"]
+
     clctx = cl_context.new_cl_context(
         client_name="caplin",
-        enr=el_context.enr,
+        enr=beacon_node_enr,
         ip_addr=el_context.ip_addr,
         http_port=4000,
         beacon_http_url="http://{0}:{1}".format(el_context.ip_addr,4000),
         cl_nodes_metrics_info=el_context.el_metrics_info,
-        beacon_service_name="lighthouse",
-        multiaddr="beacon_multiaddr",
-        peer_id=el_context.ip_addr,
+        beacon_service_name=beacon_service_name,
+        multiaddr=beacon_multiaddr,
+        peer_id=beacon_peer_id,
         snooper_enabled="false",
         snooper_engine_context="snooper_engine_context",
         validator_keystore_files_artifact_uuid=node_keystore_files.files_artifact_uuid
@@ -79,6 +96,8 @@ def launch(
         else "",
         supernode=participant.supernode,
     )
+
+
     plan.print("SPIDERMAN CL CONTEXT CREATED")
     plan.print(clctx)
     return clctx

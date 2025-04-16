@@ -42,6 +42,12 @@ def launch_participant_network(
     parallel_keystore_generation,
 ):
     network_id = network_params.network_id
+    plan.print("SPIDERMAN launch_participant_network args - ")
+    plan.print("SPIDERMAN args_with_right_defaults")
+    plan.print(args_with_right_defaults)
+    plan.print("SPIDERMAN network_params")
+    plan.print(network_params)
+
     latest_block = ""
     num_participants = len(args_with_right_defaults.participants)
     shadowfork_block = "latest"

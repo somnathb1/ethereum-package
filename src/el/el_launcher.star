@@ -26,6 +26,7 @@ def launch(
     port_publisher,
     mev_builder_type,
     mev_params,
+    # bootnode_contexts,
 ):
     el_launchers = {
         constants.EL_TYPE.geth: {
@@ -142,6 +143,7 @@ def launch(
             node_selectors,
             port_publisher,
             index,
+            # bootnode_contexts,
         )
         # Add participant el additional prometheus metrics
         for metrics_info in el_context.el_metrics_info:

@@ -14,7 +14,7 @@ METRICS_PATH = "/metrics"
 WS_RPC_PORT_NUM = 8545
 DISCOVERY_PORT_NUM = 30303
 ENGINE_RPC_PORT_NUM = 8551
-METRICS_PORT_NUM = 9001
+METRICS_PORT_NUM = 9005
 
 ENTRYPOINT_ARGS = ["sh", "-c"]
 
@@ -39,10 +39,12 @@ def launch(
     node_selectors,
     port_publisher,
     participant_index,
+    # bootnode_contexts,
 ):
-    log_level = input_parser.get_client_log_level_or_default(
-        participant.el_log_level, global_log_level, VERBOSITY_LEVELS
-    )
+    # log_level = input_parser.get_client_log_level_or_default(
+    #     participant.el_log_level, global_log_level, VERBOSITY_LEVELS
+    # )
+    log_level="3"
 
     cl_client_name = service_name.split("-")[3]
 
@@ -129,7 +131,7 @@ def get_config(
 
     used_port_assignments = {
         constants.TCP_DISCOVERY_PORT_ID: discovery_port,
-        constants.UDP_DISCOVERY_PORT_ID: discovery_port,
+        # constants.UDP_DISCOVERY_PORT_ID: discovery_port,
         constants.ENGINE_RPC_PORT_ID: ENGINE_RPC_PORT_NUM,
         constants.WS_RPC_PORT_ID: WS_RPC_PORT_NUM,
         constants.METRICS_PORT_ID: METRICS_PORT_NUM,
@@ -137,6 +139,8 @@ def get_config(
 
     if not externalcl:
         used_port_assignments[constants.HTTP_PORT_ID] = 4000
+        used_port_assignments[constants.LITTLE_BIGTABLE_PORT_ID]=9000
+        used_port_assignments[constants.UDP_DISCOVERY_PORT_ID]=9001
 
     used_ports = shared_utils.get_port_specs(used_port_assignments)
     plan.print("SPIDERMAN used_ports")
@@ -191,10 +195,10 @@ def get_config(
         )
 
         cmd.append("--beacon.api=beacon,builder,config,debug,events,node,validator,lighthouse")
-        cmd.append("--caplin.enable-upnp")
         cmd.append("--caplin.discovery.addr=0.0.0.0") 
-        cmd.append("--caplin.discovery.port=9000") 
-        cmd.append("--caplin.discovery.tcpport=9000") 
+        cmd.append("--caplin.discovery.port=9000")
+        cmd.append("--sentinel.port=9001") 
+        # cmd.append("--caplin.discovery.tcpport=9000") 
         cmd.append("--beacon.api.port=4000")
         cmd.append("--beacon.api.addr=0.0.0.0")
         
