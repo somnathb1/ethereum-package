@@ -132,7 +132,7 @@ def launch(
         beacon_service_name, METRICS_PATH, beacon_metrics_url
     )
     nodes_metrics_info = [beacon_node_metrics_info]
-    return cl_context.new_cl_context(
+    clctx = cl_context.new_cl_context(
         client_name="lighthouse",
         enr=beacon_node_enr,
         ip_addr=beacon_service.ip_address,
@@ -149,6 +149,9 @@ def launch(
         else "",
         supernode=participant.supernode,
     )
+    plan.print("SPIDERMAN LH CLTCX")
+    plan.print(clctx)
+    return clctx
 
 
 def get_beacon_config(

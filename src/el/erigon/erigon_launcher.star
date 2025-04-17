@@ -194,11 +194,12 @@ def get_config(
             + "/genesis.ssz"
         )
 
-        cmd.append("--beacon.api=beacon,builder,config,debug,events,node,validator,lighthouse")
+        cmd.append("--beacon.api=beacon,config,debug,events,node,validator,lighthouse")
         cmd.append("--caplin.discovery.addr=0.0.0.0") 
-        cmd.append("--caplin.discovery.port=9000")
-        cmd.append("--sentinel.port=9001") 
-        # cmd.append("--caplin.discovery.tcpport=9000") 
+        cmd.append("--caplin.discovery.port=9001")
+        # cmd.append("--sentinel.port=9001") 
+        cmd.append("--caplin.discovery.tcpport=9000")
+        cmd.append("--caplin.enable-upnp")
         cmd.append("--beacon.api.port=4000")
         cmd.append("--beacon.api.addr=0.0.0.0")
         
